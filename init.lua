@@ -1,5 +1,3 @@
-print("config loaded")
-
 require("config.lazy")
 
 -- lua keymaps
@@ -32,10 +30,12 @@ vim.keymap.set('n', '<C-k>', '<C-w><C-k>', { desc = 'Move focus to the upper win
 -- opts
 local set = vim.opt
 set.shiftwidth = 4
+set.tabstop = 4
 set.number = true
 set.relativenumber = true
 set.clipboard = "unnamedplus"
 set.scrolloff = 10
+set.colorcolumn = "120"
 
 -- Highlight when yanking (copying) text
 --  Try it with `yap` in normal mode
@@ -46,4 +46,19 @@ vim.api.nvim_create_autocmd('TextYankPost', {
   callback = function()
     vim.highlight.on_yank()
   end,
+})
+
+-- brief syntax
+local ftGroup = vim.api.nvim_create_augroup('filetype_group', { clear = true })
+
+vim.api.nvim_create_autocmd({ 'BufRead', 'BufNewFile' }, {
+  pattern = { '*.brief' },
+  command = 'set filetype=brief',
+  group = ftGroup,
+})
+
+vim.api.nvim_create_autocmd({ 'BufRead', 'BufNewFile' }, {
+  pattern = { '*.brief' },
+  command = 'source ~/.config/nvim/lua/config/syntax/brief.vim',
+  group = ftGroup,
 })

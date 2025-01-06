@@ -14,6 +14,31 @@ return {
     },
     config = function()
       local capabilites = require('blink.cmp').get_lsp_capabilities()
+      local configs = require 'lspconfig.configs'
+      local util = require 'lspconfig.util'
+
+      -- устанавливаем briefls config
+      if not configs.briefls then
+        configs.briefls = {
+          default_config = {
+            cmd = { 'briefls' },
+            filetypes = { 'brief' },
+            root_dir = function(fname)
+              return util.root_pattern '.git' (fname)
+            end,
+            single_file_support = true,
+            capabilities = {
+              workspace = {
+                didChangeWatchedFiles = {
+                  dynamicRegistration = true,
+                },
+              },
+            },
+          },
+          settings = {},
+        }
+      end
+
       require("lspconfig").lua_ls.setup { capabilites = capabilites }
 
       require("lspconfig").gopls.setup {
@@ -33,6 +58,13 @@ return {
             staticcheck = true,
           },
         },
+      }
+
+      require("lspconfig").briefls.setup {
+        flags = {
+          debounce_text_changes = 150,
+        },
+        capabilities = capabilites,
       }
 
       vim.api.nvim_create_autocmd('LspAttach', {
