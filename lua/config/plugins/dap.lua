@@ -14,7 +14,12 @@ return {
       local dap_go = require 'dap-go'
 
       ui.setup()
-      dap_go.setup()
+      opts = {
+        delve = {
+          build_flags = "-tags=integration",
+        },
+      }
+      dap_go.setup(opts)
 
       ---@diagnostic disable-next-line: missing-fields
       require('nvim-dap-virtual-text').setup {
@@ -49,6 +54,7 @@ return {
       vim.keymap.set('n', '<F3>', dap.step_over)
       vim.keymap.set('n', '<F4>', dap.step_out)
       vim.keymap.set('n', '<F5>', dap.step_back)
+      vim.keymap.set('n', '<F11>', dap.stop)
       vim.keymap.set('n', '<F12>', dap.restart)
 
       vim.keymap.set('n', '<F7>', ui.toggle)
@@ -99,9 +105,24 @@ return {
       },
     },
     config = function()
+      local neotest_golang_opts = {
+        runner = "go",
+        go_test_args = {
+          "-tags=integration",
+          "-v",
+          "-race",
+          "-count=1",
+          "-coverprofile=" .. vim.fn.getcwd() .. "/coverage.out",
+        },
+        dap_go_opts = {
+          delve = {
+            build_flags = { "-tags=integration" },
+          },
+        },
+      }
       require("neotest").setup({
         adapters = {
-          require("neotest-golang"), -- Registration
+          require("neotest-golang")(neotest_golang_opts), -- Registration
         },
       })
 

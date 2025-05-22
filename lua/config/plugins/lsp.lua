@@ -41,6 +41,26 @@ return {
 
       require("lspconfig").lua_ls.setup { capabilites = capabilites }
 
+      require('lspconfig').pyright.setup {
+        capabilites = capabilites,
+        cmd = { "pyright-langserver", "--stdio" },
+        filetypes = { 'python' },
+        root_dir = function(fname)
+          return util.root_pattern '.git' (fname)
+        end,
+        settings = {
+          {
+            python = {
+              analysis = {
+                autoSearchPaths = true,
+                diagnosticMode = "openFilesOnly",
+                useLibraryCodeForTypes = true
+              }
+            }
+          }
+        }
+      }
+
       require("lspconfig").gopls.setup {
         capabilites = capabilites,
         cmd = { "gopls" },
