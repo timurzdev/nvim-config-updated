@@ -7,19 +7,24 @@ return {
       'theHamsta/nvim-dap-virtual-text',
       'nvim-neotest/nvim-nio',
       'williamboman/mason.nvim',
+      'mfussenegger/nvim-dap-python',
     },
     config = function()
       local dap = require 'dap'
       local ui = require 'dapui'
       local dap_go = require 'dap-go'
+      local dap_python = require 'dap-python'
+
 
       ui.setup()
-      opts = {
+      local dap_go_opts = {
         delve = {
           build_flags = "-tags=integration",
         },
       }
-      dap_go.setup(opts)
+      dap_go.setup(dap_go_opts)
+
+      dap_python.setup('~/.virtualenv/bin/python')
 
       ---@diagnostic disable-next-line: missing-fields
       require('nvim-dap-virtual-text').setup {
