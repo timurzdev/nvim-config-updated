@@ -24,7 +24,13 @@ return {
   },
   {
     'codota/tabnine-nvim',
-    build = "./dl_binaries.sh",
+    -- build = "./dl_binaries.sh",
+    build = function()
+      -- сначала скачиваем основной дви­жок
+      vim.fn.system { 'bash', './dl_binaries.sh' }
+      -- затем Chat
+      vim.fn.system { 'bash', '-c', 'cd chat && cargo build --release' }
+    end,
     config = function()
       require('tabnine').setup({
         disable_auto_comment = true,
@@ -35,12 +41,18 @@ return {
         exclude_filetypes = { "TelescopePrompt", "NvimTree" },
         log_file_path = nil, -- absolute path to Tabnine log file
         ignore_certificate_errors = false,
-        -- workspace_folders = {
-        --   paths = { "/your/project" },
-        --   get_paths = function()
-        --       return { "/your/project" }
-        --   end,
-        -- },
+        workspace_folders = {
+          -- статический список — достаточно для одиночного репо
+          paths = { vim.fn.getcwd() },
+
+          -- динамический: ищем git-корень или LSP-workspace
+          get_paths = function()
+            local util = require("lspconfig.util")
+            local root = util.root_pattern(".git")(vim.fn.expand("%:p"))
+                or vim.fn.getcwd()
+            return { root }
+          end,
+        },
       })
     end
   },
