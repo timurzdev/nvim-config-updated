@@ -2,7 +2,6 @@ return {
   {
     "neovim/nvim-lspconfig",
     dependencies = {
-      'saghen/blink.cmp',
       {
         "folke/lazydev.nvim",
         opts = {
@@ -13,7 +12,6 @@ return {
       },
     },
     config = function()
-      local capabilites = require('blink.cmp').get_lsp_capabilities()
       local configs = require 'lspconfig.configs'
       local util = require 'lspconfig.util'
 
@@ -42,7 +40,6 @@ return {
       require("lspconfig").lua_ls.setup { capabilites = capabilites }
 
       require('lspconfig').pyright.setup {
-        capabilites = capabilites,
         cmd = { "pyright-langserver", "--stdio" },
         filetypes = { 'python' },
         root_dir = function(fname)
@@ -62,7 +59,6 @@ return {
       }
 
       require("lspconfig").gopls.setup {
-        capabilites = capabilites,
         cmd = { "gopls" },
         filetypes = { 'go', 'gomod', 'gowork', 'gotmpl' },
         settings = {
@@ -84,7 +80,6 @@ return {
         flags = {
           debounce_text_changes = 150,
         },
-        capabilities = capabilites,
       }
 
       vim.api.nvim_create_autocmd('LspAttach', {
