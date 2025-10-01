@@ -17,9 +17,16 @@ return {
 
 
       ui.setup()
+
+      local dlv_path = vim.fn.exepath("dlv")
+      if dlv_path == "" then
+        dlv_path = vim.fn.expand("~/go/bin/dlv")
+      end
+
       local dap_go_opts = {
         delve = {
-          build_flags = "-tags=integration",
+          path = dlv_path,
+          build_flags = { "-tags=integration" },
         },
       }
       dap_go.setup(dap_go_opts)
@@ -103,36 +110,54 @@ return {
       "antoinemadec/FixCursorHold.nvim",
       "nvim-treesitter/nvim-treesitter",
       {
-        "fredrikaverpil/neotest-golang", -- Installation
-        dependencies = {
-          "leoluz/nvim-dap-go",
-        },
+        "fredrikaverpil/neotest-golang",
+        version = "*",
+        build = function()
+          vim.system({ "go", "install", "gotest.tools/gotestsum@latest" }):wait()
+        end,
       },
     },
     config = function()
-      local neotest_golang_opts = {
-        runner = "go",
-        go_test_args = {
-          "-tags=integration",
-          "-v",
-          "-race",
-          "-count=1",
-          "-coverprofile=" .. vim.fn.getcwd() .. "/coverage.out",
-        },
-        dap_go_opts = {
-          delve = {
-            build_flags = { "-tags=integration" },
-          },
-        },
-      }
+      local dlv_path = vim.fn.exepath("dlv")
+      if dlv_path == "" then
+        dlv_path = vim.fn.expand("~/go/bin/dlv")
+      end
+
       require("neotest").setup({
         adapters = {
-          require("neotest-golang")(neotest_golang_opts), -- Registration
+          require("neotest-golang")({
+            runner = "gotestsum",
+            go_test_args = { "-v", "-race", "-count=1", "-tags=integration" },
+            dap_go_enabled = true,
+            dap_go_opts = {
+              delve = {
+                path = dlv_path,
+                build_flags = { "-tags=integration" },
+              },
+            },
+          }),
         },
+        log_level = vim.log.levels.DEBUG,
       })
 
       vim.keymap.set("n", "<leader>dt", function()
-        require("neotest").run.run({ suite = false, strategy = "dap" })
+        require("neotest").run.run({ strategy = "dap" })
+      end)
+
+      vim.keymap.set("n", "<leader>dr", function()
+        require("neotest").run.run()
+      end)
+
+      vim.keymap.set("n", "<leader>dT", function()
+        require("neotest").run.run(vim.fn.expand("%"))
+      end)
+
+      vim.keymap.set("n", "<leader>ds", function()
+        require("neotest").summary.toggle()
+      end)
+
+      vim.keymap.set("n", "<leader>do", function()
+        require("neotest").output.open({ enter = true })
       end)
     end,
   },
