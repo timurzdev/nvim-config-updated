@@ -1,66 +1,43 @@
 return {
   {
-    "neovim/nvim-lspconfig",
-    dependencies = {
-      {
-        "folke/lazydev.nvim",
-        opts = {
-          library = {
-            { path = "${3rd}/luv/library", words = { "vim%.uv" } },
-          },
-        },
+    "folke/lazydev.nvim",
+    opts = {
+      library = {
+        { path = "${3rd}/luv/library", words = { "vim%.uv" } },
       },
     },
+  },
+  {
+    "neovim/nvim-lspconfig",
     config = function()
-      local configs = require 'lspconfig.configs'
-      local util = require 'lspconfig.util'
+      vim.lsp.config('lua_ls', {
+        cmd = { 'lua-language-server' },
+        filetypes = { 'lua' },
+        root_markers = { '.luarc.json', '.luarc.jsonc', '.luacheckrc', '.stylua.toml', 'stylua.toml', 'selene.toml', 'selene.yml', '.git' },
+        single_file_support = true,
+      })
 
-      -- устанавливаем briefls config
-      if not configs.briefls then
-        configs.briefls = {
-          default_config = {
-            cmd = { 'briefls' },
-            filetypes = { 'brief' },
-            root_dir = function(fname)
-              return util.root_pattern '.git' (fname)
-            end,
-            single_file_support = true,
-            capabilities = {
-              workspace = {
-                didChangeWatchedFiles = {
-                  dynamicRegistration = true,
-                },
-              },
-            },
-          },
-          settings = {},
-        }
-      end
-
-      require("lspconfig").lua_ls.setup { capabilites = capabilites }
-
-      require('lspconfig').pyright.setup {
+      vim.lsp.config('pyright', {
         cmd = { "pyright-langserver", "--stdio" },
         filetypes = { 'python' },
-        root_dir = function(fname)
-          return util.root_pattern '.git' (fname)
-        end,
+        root_markers = { '.git' },
+        single_file_support = true,
         settings = {
-          {
-            python = {
-              analysis = {
-                autoSearchPaths = true,
-                diagnosticMode = "openFilesOnly",
-                useLibraryCodeForTypes = true
-              }
+          python = {
+            analysis = {
+              autoSearchPaths = true,
+              diagnosticMode = "openFilesOnly",
+              useLibraryCodeForTypes = true
             }
           }
         }
-      }
+      })
 
-      require("lspconfig").gopls.setup {
+      vim.lsp.config('gopls', {
         cmd = { "gopls" },
         filetypes = { 'go', 'gomod', 'gowork', 'gotmpl' },
+        root_markers = { 'go.work', 'go.mod', '.git' },
+        single_file_support = true,
         settings = {
           gopls = {
             buildFlags = { '-tags=integration' },
@@ -74,13 +51,26 @@ return {
             staticcheck = true,
           },
         },
-      }
+      })
 
-      require("lspconfig").briefls.setup {
+      vim.lsp.config('briefls', {
+        cmd = { 'briefls' },
+        filetypes = { 'brief' },
+        root_markers = { '.git' },
+        single_file_support = true,
+        capabilities = {
+          workspace = {
+            didChangeWatchedFiles = {
+              dynamicRegistration = true,
+            },
+          },
+        },
         flags = {
           debounce_text_changes = 150,
         },
-      }
+      })
+
+      vim.lsp.enable({ 'lua_ls', 'pyright', 'gopls', 'briefls' })
 
       vim.api.nvim_create_autocmd('LspAttach', {
         callback = function(args)

@@ -7,8 +7,6 @@ return {
       { 'nvim-telescope/telescope-fzf-native.nvim', build = 'make' },
       -- Useful for getting pretty icons, but requires a Nerd Font.
       { 'nvim-tree/nvim-web-devicons',              enabled = vim.g.have_nerd_font },
-      -- Dir
-      { 'princejoogie/dir-telescope.nvim' },
     },
     config = function()
       require('telescope').setup {
@@ -19,18 +17,10 @@ return {
         },
         extensions = {
           fzf = {},
-          dir = {
-            require('dir-telescope').setup {
-              hidden = true,
-              no_ignore = false,
-              show_preview = true,
-            },
-          },
         },
       }
 
       require('telescope').load_extension('fzf')
-      require('telescope').load_extension('dir')
       local builtin = require('telescope.builtin')
 
       vim.keymap.set("n", "<space>fh", builtin.help_tags)

@@ -53,20 +53,16 @@ return {
             end
           end, { "i", "s" }),
           ["<Tab>"] = cmp.mapping(function(fallback)
-            if luasnip.jumpable(1) then
-              luasnip.jump(1)
+            local supermaven = require('supermaven-nvim.completion_preview')
+            if supermaven.has_suggestion() then
+              supermaven.on_accept_suggestion()
             else
               fallback()
             end
           end, { "i", "s" }),
 
-          -- Jump to the previous snippet placeholder
           ["<S-Tab>"] = cmp.mapping(function(fallback)
-            if luasnip.jumpable(-1) then
-              luasnip.jump(-1)
-            else
-              fallback()
-            end
+            fallback()
           end, { "i", "s" }),
         }),
         sources = cmp.config.sources({
