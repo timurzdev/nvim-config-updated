@@ -128,6 +128,7 @@ return {
           require("neotest-golang")({
             runner = "gotestsum",
             go_test_args = { "-v", "-race", "-count=1", "-tags=integration" },
+            warn_test_name_dupes = false,
             dap_go_enabled = true,
             dap_go_opts = {
               delve = {
