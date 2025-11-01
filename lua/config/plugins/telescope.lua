@@ -50,6 +50,7 @@ return {
       vim.keymap.set('n', '<leader>fe', builtin.diagnostics, { desc = '[F]ind [E]rrors' })
       vim.keymap.set('n', '<leader>fr', builtin.resume, { desc = '[F]ind [R]esume' })
       vim.keymap.set('n', '<leader>fv', builtin.git_files, { desc = '[F]ind [V]ersioned' })
+      vim.keymap.set('n', '<leader>fu', builtin.git_status, { desc = '[F]ind [U]ncommitted' })
 
       require "config.telescope.multigrep".setup()
     end
