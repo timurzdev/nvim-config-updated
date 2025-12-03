@@ -13,58 +13,33 @@ return {
       },
     },
     config = function()
-      local capabilites = require('blink.cmp').get_lsp_capabilities()
-      local configs = require 'lspconfig.configs'
-      local util = require 'lspconfig.util'
+      local capabilities = require('blink.cmp').get_lsp_capabilities()
 
-      -- устанавливаем briefls config
-      if not configs.briefls then
-        configs.briefls = {
-          default_config = {
-            cmd = { 'briefls' },
-            filetypes = { 'brief' },
-            root_dir = function(fname)
-              return util.root_pattern '.git' (fname)
-            end,
-            single_file_support = true,
-            capabilities = {
-              workspace = {
-                didChangeWatchedFiles = {
-                  dynamicRegistration = true,
-                },
-              },
-            },
-          },
-          settings = {},
-        }
-      end
+      vim.lsp.config('lua_ls', {
+        capabilities = capabilities,
+      })
 
-      require("lspconfig").lua_ls.setup { capabilites = capabilites }
-
-      require('lspconfig').pyright.setup {
-        capabilites = capabilites,
+      vim.lsp.config('pyright', {
+        capabilities = capabilities,
         cmd = { "pyright-langserver", "--stdio" },
         filetypes = { 'python' },
-        root_dir = function(fname)
-          return util.root_pattern '.git' (fname)
-        end,
+        root_markers = { '.git' },
         settings = {
-          {
-            python = {
-              analysis = {
-                autoSearchPaths = true,
-                diagnosticMode = "openFilesOnly",
-                useLibraryCodeForTypes = true
-              }
+          python = {
+            analysis = {
+              autoSearchPaths = true,
+              diagnosticMode = "openFilesOnly",
+              useLibraryCodeForTypes = true
             }
           }
         }
-      }
+      })
 
-      require("lspconfig").gopls.setup {
-        capabilites = capabilites,
+      vim.lsp.config('gopls', {
+        capabilities = capabilities,
         cmd = { "gopls" },
         filetypes = { 'go', 'gomod', 'gowork', 'gotmpl' },
+        root_markers = { 'go.mod', '.git' },
         settings = {
           gopls = {
             buildFlags = { '-tags=integration' },
@@ -78,14 +53,16 @@ return {
             staticcheck = true,
           },
         },
-      }
+      })
 
-      require("lspconfig").briefls.setup {
-        flags = {
-          debounce_text_changes = 150,
-        },
-        capabilities = capabilites,
-      }
+      vim.lsp.config('briefls', {
+        cmd = { 'briefls' },
+        filetypes = { 'brief' },
+        root_markers = { '.git' },
+        capabilities = capabilities,
+      })
+
+      vim.lsp.enable({ 'lua_ls', 'pyright', 'gopls', 'briefls' })
 
       vim.api.nvim_create_autocmd('LspAttach', {
         callback = function(args)
