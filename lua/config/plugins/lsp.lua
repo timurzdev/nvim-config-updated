@@ -9,6 +9,7 @@ return {
   },
   {
     "neovim/nvim-lspconfig",
+    dependencies = { "b0o/schemastore.nvim" },
     config = function()
       vim.lsp.config('lua_ls', {
         cmd = { 'lua-language-server' },
@@ -53,6 +54,23 @@ return {
         },
       })
 
+      vim.lsp.config('rust_analyzer', {
+        cmd = { 'rust-analyzer' },
+        filetypes = { 'rust' },
+        root_markers = { 'Cargo.toml', '.git' },
+        single_file_support = true,
+        settings = {
+          ['rust-analyzer'] = {
+            cargo = {
+              allFeatures = true,
+            },
+            checkOnSave = {
+              command = 'clippy',
+            },
+          },
+        },
+      })
+
       vim.lsp.config('briefls', {
         cmd = { 'briefls' },
         filetypes = { 'brief' },
@@ -70,7 +88,20 @@ return {
         },
       })
 
-      vim.lsp.enable({ 'lua_ls', 'pyright', 'gopls', 'briefls' })
+      vim.lsp.config('jsonls', {
+        cmd = { 'vscode-json-language-server', '--stdio' },
+        filetypes = { 'json', 'jsonc' },
+        root_markers = { '.git' },
+        single_file_support = true,
+        settings = {
+          json = {
+            schemas = require('schemastore').json.schemas(),
+            validate = { enable = true },
+          },
+        },
+      })
+
+      vim.lsp.enable({ 'lua_ls', 'pyright', 'gopls', 'rust_analyzer', 'briefls', 'jsonls' })
 
       vim.api.nvim_create_autocmd('LspAttach', {
         callback = function(args)

@@ -33,6 +33,33 @@ return {
 
       dap_python.setup('~/.virtualenv/bin/python')
 
+      local codelldb_path = vim.fn.exepath("codelldb")
+      if codelldb_path == "" then
+        codelldb_path = vim.fn.expand("~/.local/share/nvim/mason/bin/codelldb")
+      end
+
+      dap.adapters.codelldb = {
+        type = "server",
+        port = "${port}",
+        executable = {
+          command = codelldb_path,
+          args = { "--port", "${port}" },
+        },
+      }
+
+      dap.configurations.rust = {
+        {
+          name = "Launch",
+          type = "codelldb",
+          request = "launch",
+          program = function()
+            return vim.fn.input('Path to executable: ', vim.fn.getcwd() .. '/target/debug/', 'file')
+          end,
+          cwd = "${workspaceFolder}",
+          stopOnEntry = false,
+        },
+      }
+
       ---@diagnostic disable-next-line: missing-fields
       require('nvim-dap-virtual-text').setup {
         -- This just tries to mitigate the chance that I leak tokens here. Probably won't stop it from happening...

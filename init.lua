@@ -1,4 +1,5 @@
 require("config.lazy")
+require("config.spell")
 
 -- lua keymaps
 vim.keymap.set("n", "<space><space>x", "<cmd>source %<CR>")
@@ -11,10 +12,12 @@ vim.keymap.set("n", "]c", ":cnext<CR>")
 vim.keymap.set("n", "[c", ":cprev<CR>")
 
 -- Diagnostic keymaps
----@diagnostic disable-next-line: deprecated
-vim.keymap.set('n', '[d', vim.diagnostic.goto_prev, { desc = 'Go to previous [D]iagnostic message' })
----@diagnostic disable-next-line: deprecated
-vim.keymap.set('n', ']d', vim.diagnostic.goto_next, { desc = 'Go to next [D]iagnostic message' })
+vim.keymap.set('n', '[d', function()
+  vim.diagnostic.jump({ count = -1 })
+end, { desc = 'Go to previous [D]iagnostic message' })
+vim.keymap.set('n', ']d', function()
+  vim.diagnostic.jump({ count = 1 })
+end, { desc = 'Go to next [D]iagnostic message' })
 vim.keymap.set('n', '<leader>e', vim.diagnostic.open_float, { desc = 'Show diagnostic [E]rror messages' })
 vim.keymap.set('n', '<leader>q', vim.diagnostic.setloclist, { desc = 'Open diagnostic [Q]uickfix list' })
 
