@@ -8,94 +8,9 @@ return {
     },
   },
   {
-    "nanotee/sqls.nvim",
-    ft = { "sql" },
-  },
-  {
     "neovim/nvim-lspconfig",
     dependencies = { "b0o/schemastore.nvim" },
     config = function()
-      local function setup_sqls(client, bufnr)
-        local api = vim.api
-        local sqls = require('sqls')
-        local sqls_commands = require('sqls.commands')
-
-        client.server_capabilities.executeCommandProvider = true
-        client.server_capabilities.codeActionProvider = { resolveProvider = false }
-        client.commands = sqls.commands
-
-        local client_id = client.id
-        api.nvim_buf_create_user_command(bufnr, 'SqlsExecuteQuery', function(args)
-          sqls_commands.exec(
-            client_id,
-            'executeQuery',
-            args.smods,
-            args.range ~= 0,
-            nil,
-            args.line1,
-            args.line2
-          )
-        end, { range = true })
-        api.nvim_buf_create_user_command(bufnr, 'SqlsExecuteQueryVertical', function(args)
-          sqls_commands.exec(
-            client_id,
-            'executeQuery',
-            args.smods,
-            args.range ~= 0,
-            '-show-vertical',
-            args.line1,
-            args.line2
-          )
-        end, { range = true })
-        api.nvim_buf_create_user_command(bufnr, 'SqlsShowDatabases', function(args)
-          sqls_commands.exec(client_id, 'showDatabases', args.smods)
-        end, {})
-        api.nvim_buf_create_user_command(bufnr, 'SqlsShowSchemas', function(args)
-          sqls_commands.exec(client_id, 'showSchemas', args.smods)
-        end, {})
-        api.nvim_buf_create_user_command(bufnr, 'SqlsShowConnections', function(args)
-          sqls_commands.exec(client_id, 'showConnections', args.smods)
-        end, {})
-        api.nvim_buf_create_user_command(bufnr, 'SqlsShowTables', function(args)
-          sqls_commands.exec(client_id, 'showTables', args.smods)
-        end, {})
-        api.nvim_buf_create_user_command(bufnr, 'SqlsSwitchDatabase', function(args)
-          sqls_commands.switch_database(client_id, args.args ~= '' and args.args or nil)
-        end, { nargs = '?' })
-        api.nvim_buf_create_user_command(bufnr, 'SqlsSwitchConnection', function(args)
-          sqls_commands.switch_connection(client_id, args.args ~= '' and args.args or nil)
-        end, { nargs = '?' })
-
-        api.nvim_buf_set_keymap(
-          bufnr,
-          'n',
-          '<Plug>(sqls-execute-query)',
-          "<Cmd>let &opfunc='{type -> sqls_nvim#query(type, " .. client_id .. ")}'<CR>g@",
-          { silent = true }
-        )
-        api.nvim_buf_set_keymap(
-          bufnr,
-          'x',
-          '<Plug>(sqls-execute-query)',
-          "<Cmd>let &opfunc='{type -> sqls_nvim#query(type, " .. client_id .. ")}'<CR>g@",
-          { silent = true }
-        )
-        api.nvim_buf_set_keymap(
-          bufnr,
-          'n',
-          '<Plug>(sqls-execute-query-vertical)',
-          "<Cmd>let &opfunc='{type -> sqls_nvim#query_vertical(type, " .. client_id .. ")}'<CR>g@",
-          { silent = true }
-        )
-        api.nvim_buf_set_keymap(
-          bufnr,
-          'x',
-          '<Plug>(sqls-execute-query-vertical)',
-          "<Cmd>let &opfunc='{type -> sqls_nvim#query_vertical(type, " .. client_id .. ")}'<CR>g@",
-          { silent = true }
-        )
-      end
-
       vim.lsp.config('lua_ls', {
         cmd = { 'lua-language-server' },
         filetypes = { 'lua' },
@@ -186,14 +101,7 @@ return {
         },
       })
 
-      vim.lsp.config('sqls', {
-        cmd = { 'sqls' },
-        filetypes = { 'sql' },
-        root_markers = { '.git' },
-        single_file_support = true,
-      })
-
-      vim.lsp.enable({ 'lua_ls', 'pyright', 'gopls', 'rust_analyzer', 'briefls', 'jsonls', 'sqls' })
+      vim.lsp.enable({ 'lua_ls', 'pyright', 'gopls', 'rust_analyzer', 'briefls', 'jsonls' })
 
       vim.api.nvim_create_autocmd('LspAttach', {
         callback = function(args)
@@ -225,10 +133,6 @@ return {
 
           local client = vim.lsp.get_client_by_id(args.data.client_id)
           if not client then return end
-
-          if client.name == 'sqls' then
-            setup_sqls(client, args.buf)
-          end
 
           if client:supports_method('textDocument/formatting') then
             -- Format the current buffer on save
