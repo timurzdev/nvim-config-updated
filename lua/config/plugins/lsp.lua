@@ -142,6 +142,20 @@ return {
             return
           end
 
+          local allowed_clients = {
+            lua_ls = true,
+            pyright = true,
+            gopls = true,
+            rust_analyzer = true,
+            briefls = true,
+            jsonls = true,
+          }
+
+          if not allowed_clients[client.name] then
+            client.stop()
+            return
+          end
+
           if client:supports_method("textDocument/formatting") then
             -- Format the current buffer on save
             vim.api.nvim_create_autocmd("BufWritePre", {

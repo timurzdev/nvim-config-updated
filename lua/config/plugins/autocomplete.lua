@@ -52,14 +52,6 @@ return {
               fallback()
             end
           end, { "i", "s" }),
-          ["<Tab>"] = cmp.mapping(function(fallback)
-            local supermaven = require('supermaven-nvim.completion_preview')
-            if supermaven.has_suggestion() then
-              supermaven.on_accept_suggestion()
-            else
-              fallback()
-            end
-          end, { "i", "s" }),
 
           ["<S-Tab>"] = cmp.mapping(function(fallback)
             fallback()
