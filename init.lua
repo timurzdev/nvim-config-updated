@@ -1,13 +1,12 @@
 require("config.lazy")
 require("config.spell")
-
 -- lua keymaps
 vim.keymap.set("n", "<space><space>x", "<cmd>source %<CR>")
 vim.keymap.set("n", "<space>x", ":.lua<CR>")
 vim.keymap.set("v", "<space>x", ":lua<CR>")
 
--- quickfix keymaps
 vim.keymap.set("n", "-", "<cmd>Oil<CR>")
+-- quickfix keymaps
 vim.keymap.set("n", "]c", ":cnext<CR>")
 vim.keymap.set("n", "[c", ":cprev<CR>")
 

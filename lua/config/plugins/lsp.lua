@@ -109,6 +109,7 @@ return {
       })
 
       vim.lsp.enable({ "lua_ls", "pyright", "gopls", "rust_analyzer", "briefls", "jsonls" })
+      vim.lsp.completion.enable()
 
       vim.api.nvim_create_autocmd("LspAttach", {
         callback = function(args)
@@ -152,7 +153,7 @@ return {
           }
 
           if not allowed_clients[client.name] then
-            client.stop()
+            client:stop()
             return
           end
 

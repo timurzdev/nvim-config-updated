@@ -1,5 +1,9 @@
 ;extends
 
+              ((raw_string_literal) @injection.content
+                (#match? @injection.content "^\\_s*\\c\\(select\\|insert\\|update\\|delete\\|with\\|create\\|alter\\|drop\\|truncate\\|merge\\)\\>")
+                (#set! injection.language "sql"))
+            
               ((comment) @comment
                 .
                 [
@@ -47,8 +51,4 @@
                 ]
                 (#match? @comment "^//\\s*clickhouse\\s*$|^/\\*\\s*clickhouse\\s*\\*/$")
                 (#set! injection.language "clickhouse"))
-            
-              ((raw_string_literal) @injection.content
-                (#match? @injection.content "^\\_s*\\c\\(select\\|insert\\|update\\|delete\\|with\\|create\\|alter\\|drop\\|truncate\\|merge\\)\\>")
-                (#set! injection.language "sql"))
             
