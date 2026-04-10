@@ -7,19 +7,58 @@ return {
       'theHamsta/nvim-dap-virtual-text',
       'nvim-neotest/nvim-nio',
       'williamboman/mason.nvim',
+      'mfussenegger/nvim-dap-python',
     },
     config = function()
       local dap = require 'dap'
       local ui = require 'dapui'
       local dap_go = require 'dap-go'
+      local dap_python = require 'dap-python'
+
 
       ui.setup()
-      opts = {
+
+      local dlv_path = vim.fn.exepath("dlv")
+      if dlv_path == "" then
+        dlv_path = vim.fn.expand("~/go/bin/dlv")
+      end
+
+      local dap_go_opts = {
         delve = {
-          build_flags = "-tags=integration",
+          path = dlv_path,
+          build_flags = { "-tags=integration" },
         },
       }
-      dap_go.setup(opts)
+      dap_go.setup(dap_go_opts)
+
+      dap_python.setup('~/.virtualenv/bin/python')
+
+      local codelldb_path = vim.fn.exepath("codelldb")
+      if codelldb_path == "" then
+        codelldb_path = vim.fn.expand("~/.local/share/nvim/mason/bin/codelldb")
+      end
+
+      dap.adapters.codelldb = {
+        type = "server",
+        port = "${port}",
+        executable = {
+          command = codelldb_path,
+          args = { "--port", "${port}" },
+        },
+      }
+
+      dap.configurations.rust = {
+        {
+          name = "Launch",
+          type = "codelldb",
+          request = "launch",
+          program = function()
+            return vim.fn.input('Path to executable: ', vim.fn.getcwd() .. '/target/debug/', 'file')
+          end,
+          cwd = "${workspaceFolder}",
+          stopOnEntry = false,
+        },
+      }
 
       ---@diagnostic disable-next-line: missing-fields
       require('nvim-dap-virtual-text').setup {
@@ -98,36 +137,55 @@ return {
       "antoinemadec/FixCursorHold.nvim",
       "nvim-treesitter/nvim-treesitter",
       {
-        "fredrikaverpil/neotest-golang", -- Installation
-        dependencies = {
-          "leoluz/nvim-dap-go",
-        },
+        "fredrikaverpil/neotest-golang",
+        version = "*",
+        build = function()
+          vim.system({ "go", "install", "gotest.tools/gotestsum@latest" }):wait()
+        end,
       },
     },
     config = function()
-      local neotest_golang_opts = {
-        runner = "go",
-        go_test_args = {
-          "-tags=integration",
-          "-v",
-          "-race",
-          "-count=1",
-          "-coverprofile=" .. vim.fn.getcwd() .. "/coverage.out",
-        },
-        dap_go_opts = {
-          delve = {
-            build_flags = { "-tags=integration" },
-          },
-        },
-      }
+      local dlv_path = vim.fn.exepath("dlv")
+      if dlv_path == "" then
+        dlv_path = vim.fn.expand("~/go/bin/dlv")
+      end
+
       require("neotest").setup({
         adapters = {
-          require("neotest-golang")(neotest_golang_opts), -- Registration
+          require("neotest-golang")({
+            runner = "gotestsum",
+            go_test_args = { "-v", "-race", "-count=1", "-tags=integration" },
+            warn_test_name_dupes = false,
+            dap_go_enabled = true,
+            dap_go_opts = {
+              delve = {
+                path = dlv_path,
+                build_flags = { "-tags=integration" },
+              },
+            },
+          }),
         },
+        log_level = vim.log.levels.DEBUG,
       })
 
       vim.keymap.set("n", "<leader>dt", function()
-        require("neotest").run.run({ suite = false, strategy = "dap" })
+        require("neotest").run.run({ strategy = "dap" })
+      end)
+
+      vim.keymap.set("n", "<leader>dr", function()
+        require("neotest").run.run()
+      end)
+
+      vim.keymap.set("n", "<leader>dT", function()
+        require("neotest").run.run(vim.fn.expand("%"))
+      end)
+
+      vim.keymap.set("n", "<leader>ds", function()
+        require("neotest").summary.toggle()
+      end)
+
+      vim.keymap.set("n", "<leader>do", function()
+        require("neotest").output.open({ enter = true })
       end)
     end,
   },

@@ -1,14 +1,12 @@
 return {
   {
     'nvim-telescope/telescope.nvim',
-    tag = '0.1.8',
+    branch = 'master',
     dependencies = {
       'nvim-lua/plenary.nvim',
       { 'nvim-telescope/telescope-fzf-native.nvim', build = 'make' },
       -- Useful for getting pretty icons, but requires a Nerd Font.
       { 'nvim-tree/nvim-web-devicons',              enabled = vim.g.have_nerd_font },
-      -- Dir
-      { 'princejoogie/dir-telescope.nvim' },
     },
     config = function()
       require('telescope').setup {
@@ -19,18 +17,10 @@ return {
         },
         extensions = {
           fzf = {},
-          dir = {
-            require('dir-telescope').setup {
-              hidden = true,
-              no_ignore = false,
-              show_preview = true,
-            },
-          },
         },
       }
 
       require('telescope').load_extension('fzf')
-      require('telescope').load_extension('dir')
       local builtin = require('telescope.builtin')
 
       vim.keymap.set("n", "<space>fh", builtin.help_tags)
@@ -60,6 +50,8 @@ return {
       vim.keymap.set('n', '<leader>fe', builtin.diagnostics, { desc = '[F]ind [E]rrors' })
       vim.keymap.set('n', '<leader>fr', builtin.resume, { desc = '[F]ind [R]esume' })
       vim.keymap.set('n', '<leader>fv', builtin.git_files, { desc = '[F]ind [V]ersioned' })
+      vim.keymap.set('n', '<leader>fu', builtin.git_status, { desc = '[F]ind [U]ncommitted' })
+      vim.keymap.set('n', '<leader>ss', builtin.spell_suggest, { desc = '[S]pell [S]uggest' })
 
       require "config.telescope.multigrep".setup()
     end

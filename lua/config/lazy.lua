@@ -27,8 +27,53 @@ require("lazy").setup({
     {
       "catppuccin/nvim",
       name = "catppuccin",
+      lazy = false,
       priority = 1000,
       config = function()
+        require("catppuccin").setup({
+          flavour = "mocha",
+          transparent_background = true,
+          term_colors = true,
+          custom_highlights = function(colors)
+            return {
+              ["@keyword"] = { fg = colors.yellow, style = { "bold" } },
+              ["@keyword.operator"] = { fg = colors.yellow, style = { "bold" } },
+              ["@type"] = { fg = colors.sky, style = { "bold" } },
+              ["@type.builtin"] = { fg = colors.sky, style = { "bold" } },
+              ["@function"] = { fg = colors.blue, style = { "bold" } },
+              ["@function.call"] = { fg = colors.blue, style = { "bold" } },
+              ["@string"] = { fg = colors.green },
+              ["@number"] = { fg = colors.peach, style = { "bold" } },
+              ["@constant"] = { fg = colors.peach, style = { "bold" } },
+              ["@variable"] = { fg = colors.text },
+              ["@variable.member"] = { fg = colors.teal },
+              ["@operator"] = { fg = colors.flamingo },
+              ["@comment"] = { fg = colors.overlay1, style = { "italic" } },
+              ["@punctuation.delimiter"] = { fg = colors.overlay2 },
+              ["@punctuation.bracket"] = { fg = colors.overlay2 },
+            }
+          end,
+          integrations = {
+            cmp = true,
+            dap = true,
+            dap_ui = true,
+            gitsigns = true,
+            mason = true,
+            mini = { enabled = true },
+            native_lsp = {
+              enabled = true,
+              underlines = {
+                errors = { "undercurl" },
+                hints = { "undercurl" },
+                warnings = { "undercurl" },
+                information = { "undercurl" },
+              },
+            },
+            neotest = true,
+            telescope = { enabled = true },
+            treesitter = true,
+          },
+        })
         vim.cmd.colorscheme "catppuccin"
       end
     },
