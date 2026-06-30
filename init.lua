@@ -1,15 +1,29 @@
-require("config.lazy")
-require("config.spell")
--- lua keymaps
-vim.keymap.set("n", "<space><space>x", "<cmd>source %<CR>")
-vim.keymap.set("n", "<space>x", ":.lua<CR>")
-vim.keymap.set("v", "<space>x", ":lua<CR>")
+local pack_hooks = function(ev)
+  local name, kind = ev.data.spec.name, ev.data.kind
+  if name == 'telescope-fzf-native.nvim' and (kind == 'install' or kind == 'update') then
+    vim.system({ 'make' }, { cwd = ev.data.path })
+  end
+end
 
-vim.keymap.set("n", "-", "<cmd>Oil<CR>")
+vim.pack.add({
+  'https://github.com/nvim-mini/mini.nvim',
+  'https://github.com/stevearc/oil.nvim',
+  'https://github.com/mason-org/mason.nvim',
+  'https://github.com/nvim-telescope/telescope.nvim',
+  'https://github.com/nvim-lua/plenary.nvim',
+  'https://github.com/nvim-telescope/telescope-fzf-native.nvim',
+})
+
+
+vim.api.nvim_create_autocmd('PackChanged', { callback = pack_hooks })
+
+
+require('config.lsp')
+require('config.telescope')
+
 -- quickfix keymaps
 vim.keymap.set("n", "]c", ":cnext<CR>")
 vim.keymap.set("n", "[c", ":cprev<CR>")
-
 -- Diagnostic keymaps
 vim.keymap.set('n', '[d', function()
   vim.diagnostic.jump({ count = -1 })
@@ -50,17 +64,21 @@ vim.api.nvim_create_autocmd('TextYankPost', {
   end,
 })
 
--- brief syntax
-local ftGroup = vim.api.nvim_create_augroup('filetype_group', { clear = true })
 
-vim.api.nvim_create_autocmd({ 'BufRead', 'BufNewFile' }, {
-  pattern = { '*.brief' },
-  command = 'set filetype=brief',
-  group = ftGroup,
-})
 
-vim.api.nvim_create_autocmd({ 'BufRead', 'BufNewFile' }, {
-  pattern = { '*.brief' },
-  command = 'source ~/.config/nvim/lua/config/syntax/brief.vim',
-  group = ftGroup,
-})
+-- Oil setup
+require("oil").setup(
+  {
+    view_options = {
+      -- Show files and directories that start with "."
+      show_hidden = true,
+    },
+  }
+)
+vim.keymap.set("n", "-", "<cmd>Oil<CR>")
+
+
+vim.o.complete = '.,w,b,o'
+vim.o.completeopt = 'menuone,noselect,fuzzy'
+vim.o.autocomplete = true
+vim.o.autocompletedelay = 250
