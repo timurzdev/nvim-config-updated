@@ -5,13 +5,19 @@ local pack_hooks = function(ev)
   end
 end
 
+local gh = function(plug_name)
+  return 'https://github.com/' .. plug_name
+end
+
 vim.pack.add({
-  'https://github.com/nvim-mini/mini.nvim',
-  'https://github.com/stevearc/oil.nvim',
-  'https://github.com/mason-org/mason.nvim',
-  'https://github.com/nvim-telescope/telescope.nvim',
-  'https://github.com/nvim-lua/plenary.nvim',
-  'https://github.com/nvim-telescope/telescope-fzf-native.nvim',
+  gh('nvim-mini/mini.nvim'),
+  gh('nvim-mini/mini.nvim'),
+  gh('stevearc/oil.nvim'),
+  gh('mason-org/mason.nvim'),
+  gh('nvim-telescope/telescope.nvim'),
+  gh('nvim-lua/plenary.nvim'),
+  gh('nvim-telescope/telescope-fzf-native.nvim'),
+  { src = gh('nvim-treesitter/nvim-treesitter'), version = 'main', },
 })
 
 
@@ -78,6 +84,7 @@ require("oil").setup(
 vim.keymap.set("n", "-", "<cmd>Oil<CR>")
 
 
+-- autocomplete
 vim.o.complete = '.,w,b,o'
 vim.o.completeopt = 'menuone,noselect,fuzzy'
 vim.o.autocomplete = true

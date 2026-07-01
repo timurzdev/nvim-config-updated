@@ -8,6 +8,11 @@
       "rev": "1599a473aa6f5290a5d740b1144846e6f0c3963d",
       "src": "https://github.com/nvim-mini/mini.nvim"
     },
+    "nvim-treesitter": {
+      "rev": "4916d6592ede8c07973490d9322f187e07dfefac",
+      "src": "https://github.com/nvim-treesitter/nvim-treesitter",
+      "version": "'main'"
+    },
     "oil.nvim": {
       "rev": "b73018b75affd13fa38e2fc94ef753b465f770d7",
       "src": "https://github.com/stevearc/oil.nvim"

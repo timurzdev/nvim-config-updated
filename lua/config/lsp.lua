@@ -72,7 +72,32 @@ vim.lsp.config("rust_analyzer", {
   },
 })
 
-vim.lsp.enable({ "lua_ls", "pyright", "gopls", "rust_analyzer"})
+vim.lsp.config('clangd', {
+  cmd = {
+    'clangd',
+    '--background-index',
+    '--clang-tidy',
+    '--header-insertion=iwyu'
+  },
+  filetypes = { 'c', 'cpp', 'objc', 'objcpp', 'cuda' },
+  root_markers = { '.git', 'compile_commands.json', 'compile_flags.txt' },
+  capabilities = {
+    -- Avoids encoding conflict warnings with clangd
+    offsetEncoding = { 'utf-8', 'utf-16' },
+  },
+})
+
+vim.lsp.config('cmake', {
+  cmd = { 'cmake-language-server' },
+  filetypes = { 'cmake' },
+  root_markers = { 'CMakePresets.json', 'CTestConfig.cmake', '.git', 'build' },
+  single_file_support = true,
+  init_options = {
+    buildDirectory = 'build',
+  },
+})
+
+vim.lsp.enable({ "lua_ls", "pyright", "gopls", "rust_analyzer", "clangd" })
 vim.lsp.completion.enable()
 
 vim.api.nvim_create_autocmd("LspAttach", {
@@ -115,6 +140,16 @@ vim.api.nvim_create_autocmd("LspAttach", {
           vim.lsp.buf.format({ bufnr = args.buf, id = client.id })
         end,
       })
+    end
+
+
+    -- Enable auto-completion. Note: Use CTRL-Y to select an item. |complete_CTRL-Y|
+    if client:supports_method('textDocument/completion') then
+      -- Optional: trigger autocompletion on EVERY keypress. May be slow!
+      -- local chars = {}; for i = 32, 126 do table.insert(chars, string.char(i)) end
+      -- client.server_capabilities.completionProvider.triggerCharacters = chars
+
+      vim.lsp.completion.enable(true, client.id, args.buf, { autotrigger = true })
     end
   end,
 })
