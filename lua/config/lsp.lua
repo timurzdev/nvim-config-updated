@@ -97,7 +97,7 @@ vim.lsp.config('cmake', {
   },
 })
 
-vim.lsp.enable({ "lua_ls", "pyright", "gopls", "rust_analyzer", "clangd" })
+vim.lsp.enable({ "lua_ls", "pyright", "gopls", "rust_analyzer", "clangd", 'cmake' })
 vim.lsp.completion.enable()
 
 vim.api.nvim_create_autocmd("LspAttach", {
