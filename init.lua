@@ -19,15 +19,28 @@ vim.pack.add({
   gh('nvim-telescope/telescope.nvim'),
   gh('nvim-lua/plenary.nvim'),
   gh('nvim-telescope/telescope-fzf-native.nvim'),
+  { src = gh('catppuccin/nvim'),                 name = "catppuccin" },
   { src = gh('nvim-treesitter/nvim-treesitter'), version = 'main', },
+  gh('lewis6991/gitsigns.nvim'),
 })
 
 
 vim.api.nvim_create_autocmd('PackChanged', { callback = pack_hooks })
+vim.cmd.colorscheme "catppuccin-nvim"
 
+require("catppuccin").setup({
+  integrations = {
+    gitsigns = true,
+    mini = {
+      enabled = true,
+      indentscope_color = "",
+    },
+  }
+})
 
 require('config.lsp')
 require('config.telescope')
+require('config.gitsigns')
 
 -- quickfix keymaps
 vim.keymap.set("n", "]c", ":cnext<CR>")
